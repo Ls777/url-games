@@ -35,25 +35,61 @@ const toBraille = arr => {
 
 let prevX = 0
 let prevY = 0
-let maxY = array.length
-let maxX = array[0].length
-const snake = [{ x: 0, y: 0 }]
+let maxY = array.length - 1
+let maxX = array[0].length - 1
+console.log(maxY, maxX)
+const snake = [
+  { x: 6, y: 0 },
+  { x: 5, y: 0 },
+  { x: 4, y: 0 },
+  { x: 6, y: 0 },
+  { x: 5, y: 0 },
+  { x: 4, y: 0 }
+]
 
-const move = (dir, snake) => {
-  array[snake[snake.length - 1].y][snake[snake.length - 1].x] = 0
+const move = dir => {
+  const newSegment = { ...snake[0] }
+  const removed = snake.pop()
+  array[removed.y][removed.x] = 0
   switch (dir) {
     case 'right':
-      snake[0].x += 1
-      if (snake[0].x >= maxX) {
-        snake[0].x = 0
+      newSegment.x += 1
+      if (newSegment.x > maxX) {
+        newSegment.x = 0
       }
-      array[snake[0].y][snake[0].x] = 1
+      break
+    case 'left':
+      newSegment.x -= 1
+      if (newSegment.x < 0) {
+        newSegment.x = maxX
+      }
+      break
+    case 'up':
+      newSegment.y -= 1
+      if (newSegment.y < 0) {
+        newSegment.y = maxY
+      }
+      break
+    case 'down':
+      newSegment.y += 1
+      if (newSegment.y > maxY) {
+        newSegment.y = 0
+      }
       break
   }
+
+  snake.unshift(newSegment)
+  snake.forEach(segment => {
+    console.log(array[3])
+    let x = segment.x
+    let y = segment.y
+    console.log(x, y)
+    array[y][x] = 1
+  })
 }
 
 function loop () {
-  move('right', snake)
+  move('right')
 
   let s = '>'
   s += `🇸🇳🇦🇰🇪🐍`
@@ -61,7 +97,6 @@ function loop () {
   s += toBraille(array)
   s += String.fromCharCode(0x258c)
   console.log(s)
-  console.log(array)
   window.location.hash = s
 
   setTimeout(loop, 150)
