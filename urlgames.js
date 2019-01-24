@@ -1,3 +1,7 @@
+// ⣿̓
+// ⣿̔
+// ⣿̆
+
 class Snake {
   constructor (width) {
     this.board = [
@@ -7,26 +11,66 @@ class Snake {
       new Array(width).fill(0)
     ]
     this.snake = [{ x: 3, y: 0 }, { x: 2, y: 0 }]
-    this.dot = { x: 2, y: 3 }
+    this.dot = { x: 2, y: 3, visible: false }
+    this.score = 0
     this.direction = 'right'
+    this.dirChanged = false
     this.listener = new window.keypress.Listener()
     this.listener.simple_combo('up', () => {
-      if (this.direction !== 'down') this.direction = 'up'
+      if (
+        this.direction !== 'up' &&
+        this.direction !== 'down' &&
+        this.dirChanged === false
+      ) {
+        this.direction = 'up'
+        this.dirChanged = true
+      }
     })
     this.listener.simple_combo('down', () => {
-      if (this.direction !== 'up') this.direction = 'down'
+      if (
+        this.direction !== 'down' &&
+        this.direction !== 'up' &&
+        this.dirChanged === false
+      ) {
+        this.direction = 'down'
+        this.dirChanged = true
+      }
     })
     this.listener.simple_combo('left', () => {
-      if (this.direction !== 'right') this.direction = 'left'
+      if (
+        this.direction !== 'left' &&
+        this.direction !== 'right' &&
+        this.dirChanged === false
+      ) {
+        this.direction = 'left'
+        this.dirChanged = true
+      }
     })
     this.listener.simple_combo('right', () => {
-      if (this.direction !== 'left') this.direction = 'right'
+      if (
+        this.direction !== 'right' &&
+        this.direction !== 'left' &&
+        this.dirChanged === false
+      ) {
+        this.direction = 'right'
+        this.dirChanged = true
+      }
     })
-    this.gameloop = setInterval(() => this.loop(), 300)
+    this.gameloop = setInterval(() => this.loop(), 200)
+    this.flashdotloop = setInterval(() => this.flashdot(), 300)
+  }
+
+  flashdot () {
+    this.dot.visible = !this.dot.visible
   }
 
   loop () {
+    this.dirChanged = false
     this.move()
+    this.render()
+  }
+
+  render () {
     let s = '>'
     s += `🇸🇳🇦🇰🇪🐍`
     s += String.fromCharCode(0x2590)
@@ -94,7 +138,7 @@ class Snake {
       this.gameOver()
     }
 
-    this.board[this.dot.y][this.dot.x] = 1
+    this.board[this.dot.y][this.dot.x] = this.dot.visible ? 1 : 0
     this.snake.unshift(newSegment)
     this.snake.forEach(segment => {
       this.board[segment.y][segment.x] = 1
@@ -103,16 +147,21 @@ class Snake {
 
   gameOver () {
     clearInterval(this.gameloop)
-    setTimeout(() => {
+    clearInterval(this.flashdotloop)
+    setInterval(() => {
       let s = '>'
       s += `🇸🇳🇦🇰🇪🐍`
       s += String.fromCharCode(0x2590)
-      s += 'g̸̛̺̖̰͓̥̜͆́͒͗̽̓̌̉̓͊̓͘͝ͅa̸̛̞̣͖͓̹̫͙̘̥͆̓͜m̷̺͍̼̲̝̱͚͔̑͂̀͑̈́ë̸͇̟̮̪̳̠̺̹̦̙̘̻̘́̀͜͝͠ͅó̷̘͇̲̳̘͕̭͙̍̍̎́͝ͅṽ̴̧̡͓̮̖̩̻̝͓ͅe̸̛̺̓̈̀̅̽͒̽r̶̢̦̭̠͈̳͔̰̞̲͙̾̒̐̌͑̀̎̐̍̓̊̅̀̒̀ͅ'
+      s += zalgoize('gameover', {
+        level: 1,
+        directions: ['up', 'down', 'middle']
+      })
       s += String.fromCharCode(0x258c)
       console.log(s)
       window.location.hash = s
-    }, 300)
+    }, 50)
   }
 }
 
+console.log('running')
 let snake = new Snake(12)
